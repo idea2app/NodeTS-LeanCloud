@@ -1,0 +1,23 @@
+branches:
+    only:
+        - master
+
+language: node_js
+node_js:
+    - lts/*
+cache:
+    directories:
+        - node_modules
+
+install:
+    - npm install
+script:
+    - npm run ${SCRIPT}
+    - echo source/ >> .gitignore
+    - echo \!dist/ >> .gitignore
+deploy:
+    provider: pages
+    on:
+        branch: master
+    skip_cleanup: true
+    github_token: ${TOKEN}
