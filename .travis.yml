@@ -20,4 +20,4 @@ deploy:
     on:
         branch: master
     skip_cleanup: true
-    github_token: ${TOKEN}
+    token: ${TOKEN}
