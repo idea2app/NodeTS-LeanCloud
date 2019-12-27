@@ -4,8 +4,12 @@ import Logger from 'koa-logger';
 import { init, koa2, Cloud } from 'leanengine';
 import { useKoaServer } from 'routing-controllers';
 
-import MainController from './controller/Main';
-import SessionController from './controller/Session';
+import {
+    MainController,
+    SessionController,
+    RoleController,
+    UserController
+} from './controller';
 
 const {
     LEANCLOUD_APP_ID: appId,
@@ -33,7 +37,12 @@ const app = new Koa()
 
 useKoaServer(app, {
     cors: { credentials: true },
-    controllers: [MainController, SessionController]
+    controllers: [
+        UserController,
+        RoleController,
+        SessionController,
+        MainController
+    ]
 });
 
 app.listen(port, () =>

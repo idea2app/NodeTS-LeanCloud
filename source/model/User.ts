@@ -28,3 +28,7 @@ export class UserModel {
     @IsUrl()
     avatar?: string;
 }
+
+export enum UserRole {
+    Admin = 'Admin'
+}

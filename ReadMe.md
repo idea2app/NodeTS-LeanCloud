@@ -7,6 +7,14 @@
 ## 主要特性
 
 1. [LeanCloud 手机短信验证码登录](source/controller/Session.ts)
+2. [角色管理](source/controller/Role.ts)
+3. [用户管理](source/controller/User.ts)
+
+## 环境变量
+
+|     变量名     |         作用         |
+| :------------: | :------------------: |
+| `ROOT_ACCOUNT` | 超级管理员（手机号） |
 
 ## 本地开发
 

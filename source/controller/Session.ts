@@ -12,15 +12,18 @@ import {
 } from 'routing-controllers';
 
 import { LCContext } from '../utility';
-import { UserModel } from '../model/User';
+import { UserRole, UserModel } from '../model';
+import { RoleController } from './Role';
 
 interface SignInToken {
     phone: string;
     code?: string;
 }
 
+const { ROOT_ACCOUNT } = process.env;
+
 @JsonController('/session')
-export default class SessionController {
+export class SessionController {
     @Post('/smsCode')
     sendSMSCode(@Body() { phone }: SignInToken) {
         return Cloud.requestSmsCode(phone);
@@ -34,6 +37,9 @@ export default class SessionController {
         const user = await User.signUpOrlogInWithMobilePhone(phone, code);
 
         context.saveCurrentUser(user);
+
+        if (phone === ROOT_ACCOUNT && !(await RoleController.isAdmin(user)))
+            await RoleController.create(UserRole.Admin, user);
 
         return user.toJSON();
     }

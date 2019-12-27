@@ -14,6 +14,7 @@
         "no-ex-assign": "warn",
         "require-atomic-updates": "warn",
         "@typescript-eslint/camelcase": "warn",
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/ban-ts-ignore": "warn"
     }
 }
