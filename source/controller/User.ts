@@ -12,7 +12,7 @@ import {
 } from 'routing-controllers';
 import { User, Query, Object as LCObject, Role } from 'leanengine';
 
-import { LCContext } from '../utility';
+import { LCContext, queryPage } from '../utility';
 import { RoleController } from './Role';
 
 @JsonController('/user')
@@ -20,20 +20,19 @@ export class UserController {
     @Get()
     async getList(
         @Ctx() { currentUser }: LCContext,
-        @QueryParam('pageSize') pageSize = 10,
-        @QueryParam('pageIndex') pageIndex = 1
+        @QueryParam('pageSize') size: number,
+        @QueryParam('pageIndex') index: number
     ) {
         if (!currentUser) throw new UnauthorizedError();
 
         if (!(await RoleController.isAdmin(currentUser)))
             throw new ForbiddenError();
 
-        const list = await new Query(User)
-            .limit(pageSize)
-            .skip(pageSize * --pageIndex)
-            .find({ useMasterKey: true });
-
-        return list.map(item => item.toJSON());
+        return queryPage(User, {
+            size,
+            index,
+            auth: { useMasterKey: true }
+        });
     }
 
     @Get('/:id')

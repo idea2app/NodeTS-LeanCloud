@@ -7,13 +7,17 @@ import {
     ForbiddenError,
     Get
 } from 'routing-controllers';
-import { User, ACL, Role, Query } from 'leanengine';
+import { Query, Role, User, ACL } from 'leanengine';
 
 import { LCContext } from '../utility';
 import { UserRole } from '../model';
 
 @JsonController('/role')
 export class RoleController {
+    static getAdmin() {
+        return new Query(Role).equalTo('name', UserRole.Admin).first();
+    }
+
     static async create(name: string, user: User) {
         const acl = new ACL();
 
@@ -21,9 +25,7 @@ export class RoleController {
             acl.setPublicWriteAccess(false),
             acl.setWriteAccess(user, true);
 
-        const admin = await new Query(Role)
-            .equalTo('name', UserRole.Admin)
-            .first();
+        const admin = await this.getAdmin();
 
         if (admin) acl.setRoleWriteAccess(admin, true);
 

@@ -8,7 +8,8 @@ import {
     MainController,
     SessionController,
     RoleController,
-    UserController
+    UserController,
+    FileController
 } from './controller';
 
 const {
@@ -38,6 +39,7 @@ const app = new Koa()
 useKoaServer(app, {
     cors: { credentials: true },
     controllers: [
+        FileController,
         UserController,
         RoleController,
         SessionController,
