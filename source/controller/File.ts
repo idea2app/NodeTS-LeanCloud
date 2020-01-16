@@ -1,8 +1,8 @@
 import {
     JsonController,
     Post,
+    Authorized,
     Ctx,
-    UnauthorizedError,
     UploadedFile,
     Get,
     QueryParam,
@@ -19,12 +19,11 @@ import { RoleController } from './Role';
 @JsonController('/file')
 export class FileController {
     @Post()
+    @Authorized()
     async create(
         @Ctx() { currentUser }: LCContext,
         @UploadedFile('file') { buffer, originalname }: File
     ) {
-        if (!currentUser) throw new UnauthorizedError();
-
         const acl = new ACL();
 
         acl.setPublicReadAccess(true),
@@ -41,23 +40,21 @@ export class FileController {
     }
 
     @Get()
+    @Authorized()
     getList(
-        @Ctx() { currentUser }: LCContext,
         @QueryParam('pageSize') size: number,
         @QueryParam('pageIndex') index: number
     ) {
-        if (!currentUser) throw new UnauthorizedError();
-
         return queryPage(LCFile, { size, index });
     }
 
     @Delete('/:id')
+    @Authorized()
     @OnUndefined(204)
-    async delete(@Ctx() { currentUser }: LCContext, @Param('id') id: string) {
-        if (!currentUser) throw new UnauthorizedError();
-
-        await LCObject.createWithoutData('_File', id).destroy({
-            user: currentUser
-        });
+    async delete(
+        @Ctx() { currentUser: user }: LCContext,
+        @Param('id') id: string
+    ) {
+        await LCObject.createWithoutData('_File', id).destroy({ user });
     }
 }

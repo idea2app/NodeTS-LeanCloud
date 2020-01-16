@@ -1,9 +1,9 @@
 import {
     JsonController,
+    Authorized,
     Post,
     Ctx,
     Body,
-    UnauthorizedError,
     ForbiddenError,
     Get
 } from 'routing-controllers';
@@ -43,12 +43,11 @@ export class RoleController {
     }
 
     @Post()
+    @Authorized()
     async create(
         @Ctx() { currentUser }: LCContext,
         @Body() { name }: { name: string }
     ) {
-        if (!currentUser) throw new UnauthorizedError();
-
         if (!(await RoleController.isAdmin(currentUser)))
             throw new ForbiddenError();
 
@@ -58,9 +57,8 @@ export class RoleController {
     }
 
     @Get()
+    @Authorized()
     async getAll(@Ctx() { currentUser }: LCContext) {
-        if (!currentUser) throw new UnauthorizedError();
-
         if (!(await RoleController.isAdmin(currentUser)))
             throw new ForbiddenError();
 

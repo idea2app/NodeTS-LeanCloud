@@ -4,6 +4,7 @@ import Logger from 'koa-logger';
 import { init, koa2, Cloud } from 'leanengine';
 import { useKoaServer } from 'routing-controllers';
 
+import { LCContext } from './utility';
 import {
     MainController,
     SessionController,
@@ -31,13 +32,13 @@ const app = new Koa()
         // @ts-ignore
         Cloud.CookieSession({
             framework: 'koa2',
-            secret: appKey,
-            fetchUser: true
+            secret: appKey
         })
     );
 
 useKoaServer(app, {
     cors: { credentials: true },
+    authorizationChecker: ({ context }) => !!(context as LCContext).currentUser,
     controllers: [
         FileController,
         UserController,

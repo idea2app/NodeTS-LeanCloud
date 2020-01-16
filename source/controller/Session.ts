@@ -2,18 +2,20 @@ import { User } from 'leanengine';
 import { Cloud } from 'leancloud-storage';
 import {
     JsonController,
+    Authorized,
     Get,
     Post,
     Patch,
     Delete,
     Body,
     Ctx,
-    UnauthorizedError
+    OnUndefined
 } from 'routing-controllers';
 
 import { LCContext } from '../utility';
 import { UserRole, UserModel } from '../model';
 import { RoleController } from './Role';
+import { UserController } from './User';
 
 interface SignInToken {
     phone: string;
@@ -41,35 +43,29 @@ export class SessionController {
         if (phone === ROOT_ACCOUNT && !(await RoleController.isAdmin(user)))
             await RoleController.create(UserRole.Admin, user);
 
-        return user.toJSON();
+        return UserController.getUserWithRoles(user);
     }
 
     @Get('/')
-    getProfile(@Ctx() { currentUser }: LCContext) {
-        if (!currentUser) throw new UnauthorizedError();
-
-        return currentUser.toJSON();
+    @Authorized()
+    getProfile(@Ctx() { currentUser: { id } }: LCContext) {
+        return UserController.getUserWithRoles(id);
     }
 
     @Patch('/')
+    @Authorized()
     async editProfile(
-        @Ctx() { currentUser }: LCContext,
+        @Ctx() { currentUser: user }: LCContext,
         @Body() body: UserModel
     ) {
-        if (!currentUser) throw new UnauthorizedError();
-
-        await currentUser.save(body, { user: currentUser });
-
-        return currentUser.toJSON();
+        return (await user.save(body, { user })).toJSON();
     }
 
     @Delete('/')
+    @Authorized()
+    @OnUndefined(204)
     destroy(@Ctx() context: LCContext) {
-        if (!context.currentUser) throw new UnauthorizedError();
-
         context.currentUser.logOut();
         context.clearCurrentUser();
-
-        return '';
     }
 }

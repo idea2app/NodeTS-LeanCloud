@@ -1,9 +1,9 @@
 import {
     JsonController,
     Get,
+    Authorized,
     Ctx,
     QueryParam,
-    UnauthorizedError,
     ForbiddenError,
     Param,
     Post,
@@ -12,36 +12,50 @@ import {
 } from 'routing-controllers';
 import { User, Query, Object as LCObject, Role } from 'leanengine';
 
-import { LCContext, queryPage } from '../utility';
+import { LCContext } from '../utility';
 import { RoleController } from './Role';
 
 @JsonController('/user')
 export class UserController {
+    static async getUserWithRoles(user: User | string) {
+        if (typeof user === 'string') user = await new Query(User).get(user);
+
+        const roles = (await user.getRoles()).map(role => role.getName());
+
+        return { ...user.toJSON(), roles };
+    }
+
     @Get()
+    @Authorized()
     async getList(
         @Ctx() { currentUser }: LCContext,
-        @QueryParam('pageSize') size: number,
-        @QueryParam('pageIndex') index: number
+        @QueryParam('phone') phone: string,
+        @QueryParam('pageSize') size = 10,
+        @QueryParam('pageIndex') index = 1
     ) {
-        if (!currentUser) throw new UnauthorizedError();
-
         if (!(await RoleController.isAdmin(currentUser)))
             throw new ForbiddenError();
 
-        return queryPage(User, {
-            size,
-            index,
-            auth: { useMasterKey: true }
-        });
+        const query = new Query(User);
+
+        if (phone) query.equalTo('mobilePhoneNumber', phone);
+
+        const count = await query.count({ useMasterKey: true });
+
+        query.skip(size * --index).limit(size);
+
+        const list = await query.find({ useMasterKey: true }),
+            data = [];
+
+        for (const user of list)
+            data.push(await UserController.getUserWithRoles(user));
+
+        return { data, count };
     }
 
     @Get('/:id')
-    async getOne(@Param('id') id: string) {
-        const user = await new Query(User).get(id);
-
-        const roles = (await user.getRoles()).map(item => item.toJSON());
-
-        return { ...user.toJSON(), roles };
+    getOne(@Param('id') id: string) {
+        return UserController.getUserWithRoles(id);
     }
 
     @Post('/:id/role/:rid')

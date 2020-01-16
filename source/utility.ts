@@ -11,36 +11,64 @@ export interface LCContext extends Context {
     clearCurrentUser(): any;
 }
 
+interface Condition {
+    [key: string]: any;
+}
+
 interface PageQuery {
     size?: number;
     index?: number;
-    equal?: { [key: string]: any };
+    equal?: Condition;
+    less?: Condition;
+    greater?: Condition;
+    ascend?: string[];
+    descend?: string[];
+    select?: string[];
     include?: string[];
     auth?: AuthOptions;
 }
 
 export async function queryPage<T extends Queriable>(
     model: new (...args: any[]) => T,
-    { size = 10, index = 1, equal, include = [], auth }: PageQuery
+    {
+        size = 10,
+        index = 1,
+        equal,
+        less,
+        greater,
+        ascend = [],
+        descend = ['updatedAt', 'createdAt'],
+        select = [],
+        include = [],
+        auth
+    }: PageQuery
 ) {
-    const countQuery = new Query<T>(model);
+    const query = new Query<T>(model);
 
-    for (const key in equal) countQuery.equalTo(key, equal[key]);
+    for (const key in equal)
+        if (equal[key] != null) query.equalTo(key, equal[key]);
 
-    const count = await countQuery.count(auth);
+    for (const key in less)
+        if (less[key] != null) query.lessThanOrEqualTo(key, less[key]);
+
+    for (const key in greater)
+        if (greater[key] != null) query.greaterThanOrEqualTo(key, greater[key]);
+
+    const count = await query.count(auth);
 
     if (!count) return { data: [], count };
 
-    const listQuery = new Query<T>(model);
+    for (const key of ascend) query.addAscending(key);
 
-    for (const key in equal) listQuery.equalTo(key, equal[key]);
+    for (const key of descend) query.addDescending(key);
 
-    listQuery.limit(size).skip(size * --index);
+    query.limit(size).skip(size * --index);
 
-    if (include[0]) listQuery.include(...include);
+    if (select[0]) query.select(...select);
 
-    return {
-        data: (await listQuery.find(auth)).map(item => item.toJSON()),
-        count
-    };
+    if (include[0]) query.include(...include);
+
+    const data = (await query.find(auth)).map(item => item.toJSON());
+
+    return { data, count };
 }
