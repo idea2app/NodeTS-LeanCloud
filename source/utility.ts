@@ -1,47 +1,18 @@
 import { Context } from 'koa';
-import { User, Query, AuthOptions, Queriable } from 'leanengine';
+import { AuthOptions, Queriable, Query } from 'leanengine';
 
-export interface LCUser extends User {
-    logOut(): any;
+interface QueryOptions {
+    equal?: Record<string, any>;
+    less?: Record<string, any>;
+    greater?: Record<string, any>;
+    startsWith?: Record<string, string>;
+    contains?: Record<string, string>;
+    matches?: Record<string, string>;
 }
 
-export interface LCContext extends Context {
-    saveCurrentUser(user: User): any;
-    currentUser: LCUser;
-    clearCurrentUser(): any;
-}
-
-interface Condition {
-    [key: string]: any;
-}
-
-interface PageQuery {
-    size?: number;
-    index?: number;
-    equal?: Condition;
-    less?: Condition;
-    greater?: Condition;
-    ascend?: string[];
-    descend?: string[];
-    select?: string[];
-    include?: string[];
-    auth?: AuthOptions;
-}
-
-export async function queryPage<T extends Queriable>(
+export function makeQuery<T extends Queriable>(
     model: new (...args: any[]) => T,
-    {
-        size = 10,
-        index = 1,
-        equal,
-        less,
-        greater,
-        ascend = [],
-        descend = ['updatedAt', 'createdAt'],
-        select = [],
-        include = [],
-        auth
-    }: PageQuery
+    { equal, less, greater, startsWith, contains, matches }: QueryOptions
 ) {
     const query = new Query<T>(model);
 
@@ -54,6 +25,36 @@ export async function queryPage<T extends Queriable>(
     for (const key in greater)
         if (greater[key] != null) query.greaterThanOrEqualTo(key, greater[key]);
 
+    for (const key in startsWith) query.startsWith(key, startsWith[key]);
+
+    for (const key in contains) query.contains(key, contains[key]);
+
+    for (const key in matches) query.contains(key, matches[key]);
+
+    return query;
+}
+
+interface FetchOptions {
+    size?: number;
+    index?: number;
+    ascend?: string[];
+    descend?: string[];
+    select?: string[];
+    include?: string[];
+}
+
+export async function fetchPage<D, M extends Queriable = Queriable>(
+    query: Query<M>,
+    {
+        size = 10,
+        index = 1,
+        ascend = [],
+        descend = ['updatedAt', 'createdAt'],
+        select = [],
+        include = []
+    }: FetchOptions = {},
+    auth?: AuthOptions
+) {
     const count = await query.count(auth);
 
     if (!count) return { data: [], count };
@@ -68,7 +69,7 @@ export async function queryPage<T extends Queriable>(
 
     if (include[0]) query.include(...include);
 
-    const data = (await query.find(auth)).map(item => item.toJSON());
+    const data = (await query.find(auth)).map(item => item.toJSON() as D);
 
     return { data, count };
 }

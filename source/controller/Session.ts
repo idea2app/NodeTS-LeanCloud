@@ -1,5 +1,3 @@
-import { User } from 'leanengine';
-import { Cloud } from 'leancloud-storage';
 import {
     JsonController,
     Authorized,
@@ -8,64 +6,77 @@ import {
     Patch,
     Delete,
     Body,
-    Ctx,
+    CurrentUser,
+    ForbiddenError,
     OnUndefined
 } from 'routing-controllers';
+import { ResponseSchema } from 'routing-controllers-openapi';
+import { sign } from 'jsonwebtoken';
+import { User } from 'leanengine';
+import { Cloud } from 'leancloud-storage';
 
-import { LCContext } from '../utility';
-import { UserRole, UserModel } from '../model';
-import { RoleController } from './Role';
-import { UserController } from './User';
+import {
+    SMSCodeRequest,
+    SignInRequest,
+    SignInResponse,
+    UserRole,
+    UserModel
+} from '../model';
 
-interface SignInToken {
-    phone: string;
-    code?: string;
-}
-
-const { ROOT_ACCOUNT } = process.env;
+const { ROOT_ACCOUNT, LEANCLOUD_APP_KEY } = process.env;
 
 @JsonController('/session')
 export class SessionController {
     @Post('/smsCode')
-    sendSMSCode(@Body() { phone }: SignInToken) {
+    sendSMSCode(@Body() { mobilePhoneNumber: phone }: SMSCodeRequest) {
         return Cloud.requestSmsCode(phone);
     }
 
-    @Post('/')
+    @Post()
+    @ResponseSchema(SignInResponse)
     async signIn(
-        @Body() { phone, code }: SignInToken,
-        @Ctx() context: LCContext
+        @Body()
+        { mobilePhoneNumber: phone, verificationCode: code }: SignInRequest
     ) {
         const user = await User.signUpOrlogInWithMobilePhone(phone, code);
 
-        context.saveCurrentUser(user);
+        if (!user.get('roles') && phone === ROOT_ACCOUNT)
+            await user.save({ roles: [UserRole.Admin] }, { user });
 
-        if (phone === ROOT_ACCOUNT && !(await RoleController.isAdmin(user)))
-            await RoleController.create(UserRole.Admin, user);
-
-        return UserController.getUserWithRoles(user);
+        return {
+            token: sign(
+                { token: user.getSessionToken(), roles: user.get('roles') },
+                LEANCLOUD_APP_KEY,
+                { expiresIn: '7d' }
+            )
+        } as SignInResponse;
     }
 
-    @Get('/')
+    @Get()
     @Authorized()
-    getProfile(@Ctx() { currentUser: { id } }: LCContext) {
-        return UserController.getUserWithRoles(id);
+    @ResponseSchema(UserModel)
+    async getProfile(@CurrentUser() user: User) {
+        return (await user.fetch()).toJSON() as UserModel;
     }
 
-    @Patch('/')
+    @Patch()
     @Authorized()
+    @ResponseSchema(UserModel)
     async editProfile(
-        @Ctx() { currentUser: user }: LCContext,
-        @Body() body: UserModel
+        @CurrentUser() user: User,
+        @Body() { roles, ...data }: UserModel
     ) {
-        return (await user.save(body, { user })).toJSON();
+        if (roles) throw new ForbiddenError();
+
+        return (
+            await user.save(data, { user, fetchWhenSave: true })
+        ).toJSON() as UserModel;
     }
 
-    @Delete('/')
+    @Delete()
     @Authorized()
     @OnUndefined(204)
-    destroy(@Ctx() context: LCContext) {
-        context.currentUser.logOut();
-        context.clearCurrentUser();
+    async destroy() {
+        await User.logOut();
     }
 }

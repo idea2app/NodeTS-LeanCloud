@@ -1,34 +1,60 @@
 import {
-    IsMobilePhone,
-    Length,
-    IsUrl,
-    IsEnum,
-    IsPositive
+    IsOptional,
+    IsPositive,
+    IsString,
+    IsArray,
+    IsEmail,
+    IsMobilePhone
 } from 'class-validator';
 
-export enum Gender {
-    Male,
-    Female,
-    Other
-}
+import { BaseModel } from './Base';
 
-export class UserModel {
+export class SMSCodeRequest {
     @IsMobilePhone('zh-CN')
     mobilePhoneNumber: string;
+}
 
-    @Length(3)
-    name?: string;
+export class SignInRequest extends SMSCodeRequest {
+    @IsString()
+    verificationCode: string;
+}
 
-    @IsEnum(Gender)
-    gender?: Gender;
+export class SignInResponse {
+    @IsString()
+    token: string;
+}
 
+export class UserModel extends BaseModel {
+    @IsOptional()
+    @IsString()
+    username?: string;
+
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsMobilePhone('zh-CN')
+    mobilePhoneNumber?: string;
+
+    @IsOptional()
+    @IsArray()
+    roles?: string[];
+}
+
+export class UserList {
     @IsPositive()
-    age?: number;
+    count: number;
 
-    @IsUrl()
-    avatar?: string;
+    @IsArray()
+    data: UserModel[];
 }
 
 export enum UserRole {
     Admin = 'Admin'
+}
+
+export interface JWTData {
+    token: string;
+    roles?: (keyof typeof UserRole)[];
 }

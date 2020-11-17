@@ -13,8 +13,10 @@
     "rules": {
         "no-ex-assign": "warn",
         "require-atomic-updates": "warn",
-        "@typescript-eslint/camelcase": "warn",
+        "@typescript-eslint/restrict-plus-operands": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/ban-ts-ignore": "warn"
+        "@typescript-eslint/explicit-module-boundary-types": "off"
     }
 }

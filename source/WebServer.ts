@@ -1,17 +1,13 @@
 import 'reflect-metadata';
-import Koa from 'koa';
+import Koa, { Context } from 'koa';
 import Logger from 'koa-logger';
-import { init, koa2, Cloud } from 'leanengine';
+import JWT from 'koa-jwt';
 import { useKoaServer } from 'routing-controllers';
+import { init, koa2, User } from 'leanengine';
+import { koaSwagger } from 'koa2-swagger-ui';
 
-import { LCContext } from './utility';
-import {
-    MainController,
-    SessionController,
-    RoleController,
-    UserController,
-    FileController
-} from './controller';
+import { spec, router } from './controller';
+import { UserRole, JWTData } from './model';
 
 const {
     LEANCLOUD_APP_ID: appId,
@@ -28,26 +24,31 @@ init({ appId, appKey, masterKey });
 const app = new Koa()
     .use(Logger())
     .use(koa2())
-    .use(
-        // @ts-ignore
-        Cloud.CookieSession({
-            framework: 'koa2',
-            secret: appKey
-        })
-    );
+    .use(koaSwagger({ swaggerOptions: { spec } }))
+    .use(JWT({ secret: appKey, passthrough: true }));
 
 useKoaServer(app, {
     cors: { credentials: true },
-    authorizationChecker: ({ context }) => !!(context as LCContext).currentUser,
-    controllers: [
-        FileController,
-        UserController,
-        RoleController,
-        SessionController,
-        MainController
-    ]
+    authorizationChecker: (
+        { context: { state } }: { context?: Context },
+        required_roles: (keyof typeof UserRole)[]
+    ) => {
+        if (!state.user) return false;
+
+        const { roles } = state.user as JWTData;
+
+        return required_roles[0]
+            ? roles?.some(role => required_roles.includes(role))
+            : true;
+    },
+    currentUserChecker: ({ context: { state } }: { context?: Context }) =>
+        User.become((state.user as JWTData).token),
+    ...router
 });
 
-app.listen(port, () =>
-    console.log('HTTP Server runs at http://localhost:' + port)
-);
+app.listen(port, () => {
+    const baseURL = `http://localhost:${port}`;
+
+    console.log(`HTTP Server runs at ${baseURL}`);
+    console.log(`RESTful API document serves at ${baseURL}/docs`);
+});
