@@ -2,8 +2,8 @@
 
 基于 [Koa][1]、[TypeScript][2]、[Swagger][3] 和 [LeanCloud][4] 的 **Node.js 后端**项目脚手架
 
-[![NPM Dependency](https://david-dm.org/TechQuery/NodeTS-LeanCloud.svg)][5]
-[![CI & CD](https://github.com/TechQuery/NodeTS-LeanCloud/workflows/CI%20&%20CD/badge.svg)][6]
+[![NPM Dependency](https://david-dm.org/idea2app/NodeTS-LeanCloud.svg)][5]
+[![CI & CD](https://github.com/idea2app/NodeTS-LeanCloud/workflows/CI%20&%20CD/badge.svg)][6]
 
 ## 主要特性
 
@@ -24,12 +24,13 @@
 
 3. 安装 [Node.js](https://nodejs.org/en/download/package-manager/)
 
-4. `git clone https://github.com/TechQuery/NodeTS-LeanCloud.git`
+4. `git clone https://github.com/idea2app/NodeTS-LeanCloud.git`
 
 5. 在本项目文件夹执行安装命令，并登录 LeanCloud 账号，再切换到本应用后启动
 
 ```shell
 npm install
+npx husky install
 
 lean login
 lean switch
@@ -42,5 +43,5 @@ lean up
 [2]: https://www.typescriptlang.org/
 [3]: https://swagger.io/
 [4]: https://leancloud.cn/
-[5]: https://david-dm.org/TechQuery/NodeTS-LeanCloud
-[6]: https://github.com/TechQuery/NodeTS-LeanCloud/actions
+[5]: https://david-dm.org/idea2app/NodeTS-LeanCloud
+[6]: https://github.com/idea2app/NodeTS-LeanCloud/actions

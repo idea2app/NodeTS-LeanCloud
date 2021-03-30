@@ -6,42 +6,42 @@
     "private": true,
     "main": "dist/index.js",
     "engines": {
-        "node": "^12.0.0"
+        "node": ">=12.0.0"
     },
     "dependencies": {
-        "class-transformer": "^0.3.1",
-        "class-validator": "^0.12.2",
-        "class-validator-jsonschema": "^2.0.3",
+        "class-transformer": "^0.4.0",
+        "class-validator": "^0.13.1",
+        "class-validator-jsonschema": "^3.0.1",
         "jsonwebtoken": "^8.5.1",
         "kcors": "^2.2.2",
-        "koa": "^2.13.0",
+        "koa": "^2.13.1",
         "koa-bodyparser": "^4.3.0",
         "koa-jwt": "^4.0.0",
         "koa-logger": "^3.2.1",
         "koa-multer": "^1.0.2",
         "koa-router": "^10.0.0",
         "koa-static": "^5.0.0",
-        "koa2-swagger-ui": "^5.0.3",
-        "leancloud-storage": "^4.7.0",
+        "koa2-swagger-ui": "^5.0.5",
+        "leancloud-storage": "^4.10.1",
         "leanengine": "^3.7.0",
         "reflect-metadata": "^0.1.13",
-        "routing-controllers": "^0.8.1",
-        "routing-controllers-openapi": "^2.1.0"
+        "routing-controllers": "^0.9.0",
+        "routing-controllers-openapi": "^3.0.0"
     },
     "devDependencies": {
-        "@types/jsonwebtoken": "^8.5.0",
-        "@types/koa": "^2.11.6",
+        "@types/jsonwebtoken": "^8.5.1",
+        "@types/koa": "^2.13.1",
         "@types/koa-logger": "^3.1.1",
-        "@types/node": "^14.14.7",
-        "@typescript-eslint/eslint-plugin": "^4.8.1",
-        "@typescript-eslint/parser": "^4.8.1",
-        "eslint": "^7.13.0",
-        "husky": "^4.3.0",
-        "lint-staged": "^10.5.1",
-        "nodemon": "^2.0.6",
-        "prettier": "^2.1.2",
-        "ts-node": "^9.0.0",
-        "typescript": "^4.0.5"
+        "@types/node": "^14.14.37",
+        "@typescript-eslint/eslint-plugin": "^4.20.0",
+        "@typescript-eslint/parser": "^4.20.0",
+        "eslint": "^7.23.0",
+        "husky": "^6.0.0",
+        "lint-staged": "^10.5.4",
+        "nodemon": "^2.0.7",
+        "prettier": "^2.2.1",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.2.3"
     },
     "prettier": {
         "singleQuote": true,
@@ -62,11 +62,5 @@
         "build": "rm -rf dist/  &&  tsc",
         "deploy": "lint-staged  &&  npm run build  &&  lean deploy",
         "start": "node dist/"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm test",
-            "pre-push": "npm run build"
-        }
     }
 }

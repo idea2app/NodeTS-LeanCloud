@@ -1,6 +1,7 @@
 import {
     IsOptional,
     IsString,
+    IsUUID,
     IsPositive,
     IsDateString,
     IsUrl
@@ -8,7 +9,7 @@ import {
 
 export class BaseModel {
     @IsOptional()
-    @IsString()
+    @IsUUID()
     objectId?: string;
 
     @IsOptional()

@@ -1,10 +1,12 @@
+import { Type } from 'class-transformer';
 import {
     IsOptional,
     IsPositive,
     IsString,
     IsArray,
     IsEmail,
-    IsMobilePhone
+    IsMobilePhone,
+    ValidateNested
 } from 'class-validator';
 
 import { BaseModel } from './Base';
@@ -46,7 +48,8 @@ export class UserList {
     @IsPositive()
     count: number;
 
-    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UserModel)
     data: UserModel[];
 }
 
