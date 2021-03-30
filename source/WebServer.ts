@@ -4,10 +4,10 @@ import Logger from 'koa-logger';
 import JWT from 'koa-jwt';
 import { useKoaServer } from 'routing-controllers';
 import { init, koa2, User } from 'leanengine';
-import { koaSwagger } from 'koa2-swagger-ui';
+import { createAPI } from 'koagger';
 
-import { spec, router } from './controller';
 import { UserRole, JWTData } from './model';
+import controllers from './controller';
 
 const {
     LEANCLOUD_APP_ID: appId,
@@ -17,14 +17,15 @@ const {
     LEANCLOUD_APP_PORT: appPort
 } = process.env;
 
-const port = parseInt(appPort || PORT || '8080');
+const port = parseInt(appPort || PORT || '8080'),
+    { swagger, router } = createAPI({ controllers });
 
 init({ appId, appKey, masterKey });
 
 const app = new Koa()
     .use(Logger())
     .use(koa2())
-    .use(koaSwagger({ swaggerOptions: { spec } }))
+    .use(swagger())
     .use(JWT({ secret: appKey, passthrough: true }));
 
 useKoaServer(app, {
