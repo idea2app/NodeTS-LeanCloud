@@ -16,9 +16,14 @@ export class SMSCodeRequest {
     mobilePhoneNumber: string;
 }
 
-export class SignInRequest extends SMSCodeRequest {
+export class SignInPhoneRequest extends SMSCodeRequest {
     @IsString()
     verificationCode: string;
+}
+
+export class SignInOAuthRequest {
+    @IsString()
+    code: string;
 }
 
 export class SignInResponse {

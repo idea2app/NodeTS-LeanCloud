@@ -1,4 +1,4 @@
-import { Context } from 'koa';
+import fetch from 'node-fetch';
 import { AuthOptions, Queriable, Query } from 'leanengine';
 
 interface QueryOptions {
@@ -72,4 +72,30 @@ export async function fetchPage<D, M extends Queriable = Queriable>(
     const data = (await query.find(auth)).map(item => item.toJSON() as D);
 
     return { data, count };
+}
+
+const { WMA_ID, WMA_KEY } = process.env;
+/**
+ * @see https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
+ */
+export async function getWechatSession(code: string) {
+    const response = await fetch(
+        `https://api.weixin.qq.com/sns/jscode2session?${new URLSearchParams({
+            appid: WMA_ID,
+            secret: WMA_KEY,
+            js_code: code,
+            grant_type: 'authorization_code'
+        })}`
+    );
+    const {
+        openid,
+        session_key,
+        unionid,
+        errcode,
+        errmsg
+    } = await response.json();
+
+    if (errcode) throw URIError(errmsg);
+
+    return { openid, session_key, unionid };
 }

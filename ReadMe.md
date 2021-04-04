@@ -7,14 +7,17 @@
 
 ## 主要特性
 
-1. [LeanCloud 手机短信验证码登录](source/controller/Session.ts)
-2. [用户管理](source/controller/User.ts)
+1. [LeanCloud 手机短信验证码登录](source/controller/Session.ts#L40-L57)
+2. [LeanCloud 微信 OAuth 登录](source/controller/Session.ts#L59-L71)
+3. [用户管理](source/controller/User.ts)
 
 ## 环境变量
 
 |     变量名     |         作用         |
 | :------------: | :------------------: |
 | `ROOT_ACCOUNT` | 超级管理员（手机号） |
+|    `WMA_ID`    |     微信 App ID      |
+|   `WMA_KEY`    |     微信 App Key     |
 
 ## 本地开发
 
