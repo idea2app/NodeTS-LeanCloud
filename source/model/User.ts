@@ -4,32 +4,19 @@ import {
     IsPositive,
     IsString,
     IsArray,
-    IsEmail,
     IsMobilePhone,
+    IsEmail,
+    IsUrl,
     ValidateNested
 } from 'class-validator';
 
 import { BaseModel } from './Base';
 
-export class SMSCodeRequest {
-    @IsMobilePhone('zh-CN')
-    mobilePhoneNumber: string;
+export enum UserRole {
+    Admin = 'Admin'
 }
 
-export class SignInPhoneRequest extends SMSCodeRequest {
-    @IsString()
-    verificationCode: string;
-}
-
-export class SignInOAuthRequest {
-    @IsString()
-    code: string;
-}
-
-export class SignInResponse {
-    @IsString()
-    token: string;
-}
+export type UserRoleName = keyof typeof UserRole;
 
 export class UserModel extends BaseModel {
     @IsOptional()
@@ -46,7 +33,11 @@ export class UserModel extends BaseModel {
 
     @IsOptional()
     @IsArray()
-    roles?: string[];
+    roles?: UserRoleName[];
+
+    @IsOptional()
+    @IsUrl()
+    avatar?: string;
 }
 
 export class UserList {
@@ -58,11 +49,7 @@ export class UserList {
     data: UserModel[];
 }
 
-export enum UserRole {
-    Admin = 'Admin'
-}
-
 export interface JWTData {
     token: string;
-    roles?: (keyof typeof UserRole)[];
+    roles?: UserRoleName[];
 }
