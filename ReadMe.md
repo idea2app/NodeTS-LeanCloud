@@ -1,15 +1,17 @@
 # NodeTS LeanCloud
 
-基于 [Koa][1]、[TypeScript][2]、[Swagger][3] 和 [LeanCloud][4] 的 **Node.js 后端**项目脚手架
+基于 [TypeScript][1]、[Koa][2]、[Swagger][3] 和 [LeanCloud][4] 的 **Node.js 后端**项目脚手架
 
 [![NPM Dependency](https://david-dm.org/idea2app/NodeTS-LeanCloud.svg)][5]
 [![CI & CD](https://github.com/idea2app/NodeTS-LeanCloud/workflows/CI%20&%20CD/badge.svg)][6]
 
 ## 主要特性
 
-1. [LeanCloud 手机短信验证码登录](source/controller/Session.ts#L40-L57)
-2. [LeanCloud 微信 OAuth 登录](source/controller/Session.ts#L59-L71)
-3. [用户管理](source/controller/User.ts)
+-   [HTTP RESTful 服务](source/WebServer.ts)
+    1. [LeanCloud 手机短信验证码登录](source/controller/Session.ts#L40-L57)
+    2. [LeanCloud 微信 OAuth 登录](source/controller/Session.ts#L59-L71)
+    3. [用户管理](source/controller/User.ts)
+-   [WebSocket 服务](source/SocketServer.ts)
 
 ## 环境变量
 
@@ -21,7 +23,7 @@
 
 ## 本地开发
 
-1. 注册 [LeanCloud][3] 账号
+1. 注册 [LeanCloud][4] 账号
 
 2. 安装 [LeanCloud CLI](https://leancloud.cn/docs/leanengine_cli.html#hash1443149115)
 
@@ -40,11 +42,12 @@ lean switch
 lean up
 ```
 
-6. 建议安装 [NIM 调试扩展](https://chrome.google.com/webstore/detail/nodejs-v8-inspector-manag/gnhhdgbaldcilmgcpfddgdbkhjohddkj)
+6. 建议安装 [NIM 调试扩展][7]
 
-[1]: https://koajs.com/
-[2]: https://www.typescriptlang.org/
+[1]: https://www.typescriptlang.org/
+[2]: https://koajs.com/
 [3]: https://swagger.io/
 [4]: https://leancloud.cn/
 [5]: https://david-dm.org/idea2app/NodeTS-LeanCloud
 [6]: https://github.com/idea2app/NodeTS-LeanCloud/actions
+[7]: https://chrome.google.com/webstore/detail/nodejs-v8-inspector-manag/gnhhdgbaldcilmgcpfddgdbkhjohddkj

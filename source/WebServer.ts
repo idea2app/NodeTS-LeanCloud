@@ -12,13 +12,10 @@ import controllers from './controller';
 const {
     LEANCLOUD_APP_ID: appId,
     LEANCLOUD_APP_KEY: appKey,
-    LEANCLOUD_APP_MASTER_KEY: masterKey,
-    PORT,
-    LEANCLOUD_APP_PORT: appPort
+    LEANCLOUD_APP_MASTER_KEY: masterKey
 } = process.env;
 
-const port = parseInt(appPort || PORT || '8080'),
-    { swagger, router } = createAPI({ controllers });
+const { swagger, router } = createAPI({ controllers });
 
 init({ appId, appKey, masterKey });
 
@@ -47,9 +44,4 @@ useKoaServer(app, {
     ...router
 });
 
-app.listen(port, () => {
-    const baseURL = `http://localhost:${port}`;
-
-    console.log(`HTTP Server runs at ${baseURL}`);
-    console.log(`RESTful API document serves at ${baseURL}/docs`);
-});
+export default app;
