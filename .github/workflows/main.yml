@@ -26,3 +26,10 @@ jobs:
                   publish_branch: release
                   personal_token: ${{ secrets.GITHUB_TOKEN }}
                   force_orphan: true
+            - name: Deploy to LeanEngine
+              env:
+                  LEANCLOUD_WEBHOOKS: ${{ secrets.LEANCLOUD_WEBHOOKS }}
+              if: ${{ env.LEANCLOUD_WEBHOOKS }}
+              uses: enflo/curl-action@v1.2
+              with:
+                  curl: -X POST ${{ secrets.LEANCLOUD_WEBHOOKS }}
