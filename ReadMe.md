@@ -44,6 +44,16 @@ lean up
 
 6. 建议安装 [NIM 调试扩展][7]
 
+## 配置 GitHub 仓库自动部署到 LeanCloud
+
+1. 获取 LeanCloud 自动部署 WebHooks:
+
+  **LeanCloud** > 云引擎 > WEB > 部署 > 自动部署，填写**部署分支**为 `release`，选择需要部署的**环境**，复制该链接。
+
+2. 设置 GitHub Actions secrets：
+
+  **GitHub 仓库** > Settings > Secrets > Actions > 点击 **New repository secret** 按钮 > 设置 **Name** 为 `LEANCLOUD_WEBHOOKS`， **Value** 为上一步获取的链接。
+
 [1]: https://www.typescriptlang.org/
 [2]: https://koajs.com/
 [3]: https://swagger.io/
