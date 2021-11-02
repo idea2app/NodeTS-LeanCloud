@@ -3,22 +3,43 @@ import {
     IsString,
     IsUUID,
     IsPositive,
-    IsDateString,
+    IsDate,
     IsUrl
 } from 'class-validator';
+import { Object as LCObject } from 'leancloud-storage';
 
-export class BaseModel {
+export type TypeKeys<D, V> = {
+    [K in keyof D]: D[K] extends V ? K : never;
+}[keyof D];
+
+export type DataKeys<D> = Omit<D, TypeKeys<D, Function>>;
+
+const LCObjectDataKeys = ['attributes', 'cid', 'changed'];
+
+export class BaseModel extends LCObject {
     @IsOptional()
     @IsUUID()
     objectId?: string;
 
     @IsOptional()
-    @IsDateString()
-    createdAt?: string;
+    @IsDate()
+    createdAt?: Date;
 
     @IsOptional()
-    @IsDateString()
-    updatedAt?: string;
+    @IsDate()
+    updatedAt?: Date;
+
+    constructor(data: DataKeys<BaseModel>) {
+        super();
+
+        for (const key in data)
+            if (
+                Object.prototype.hasOwnProperty.call(data, key) &&
+                key[0] !== '_' &&
+                !LCObjectDataKeys.includes(key)
+            )
+                this.set(key, data[key]);
+    }
 }
 
 export class FileModel extends BaseModel {

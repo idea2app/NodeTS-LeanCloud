@@ -20,7 +20,7 @@ server.listen(port, () => {
 
     console.log(`
 HTTP Server runs at ${baseHTTP}/
-RESTful API document serves at ${baseHTTP}/docs/
+RESTful API document serves at ${baseHTTP}/docs
 WebSocket Server runs at ws://${host}/
 `);
 });
