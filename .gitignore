@@ -59,9 +59,6 @@ typings/
 # dotenv environment variables file
 .env
 
-# Husky Git hooks
-.husky/_/
-
 # next.js build output
 .next
 
