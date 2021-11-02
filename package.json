@@ -1,0 +1,67 @@
+{
+    "name": "nodets-leancloud",
+    "version": "0.6.0",
+    "description": "Node.js Back-end project scaffold based on TypeScript, Koa, Swagger & LeanCloud",
+    "author": "shiy2008@gmail.com",
+    "private": true,
+    "main": "dist/index.js",
+    "engines": {
+        "node": ">=12.0.0"
+    },
+    "dependencies": {
+        "class-transformer": "^0.4.0",
+        "class-validator": "^0.13.1",
+        "jsonwebtoken": "^8.5.1",
+        "kcors": "^2.2.2",
+        "koa": "^2.13.4",
+        "koa-bodyparser": "^4.3.0",
+        "koa-jwt": "^4.0.3",
+        "koa-logger": "^3.2.1",
+        "koa-mount": "^4.0.0",
+        "koa-multer": "^1.0.2",
+        "koa-router": "^10.1.1",
+        "koa-static": "^5.0.0",
+        "koagger": "^0.2.1",
+        "leancloud-storage": "^4.12.0",
+        "leanengine": "^3.8.0",
+        "node-fetch": "^2.6.6",
+        "reflect-metadata": "^0.1.13",
+        "routing-controllers": "^0.9.0",
+        "ws": "^7.5.5"
+    },
+    "devDependencies": {
+        "@types/jsonwebtoken": "^8.5.5",
+        "@types/koa": "^2.13.4",
+        "@types/koa-logger": "^3.1.2",
+        "@types/node": "^14.17.32",
+        "@types/node-fetch": "^2.5.12",
+        "@typescript-eslint/eslint-plugin": "^5.3.0",
+        "@typescript-eslint/parser": "^5.3.0",
+        "eslint": "^8.1.0",
+        "eslint-config-prettier": "^8.3.0",
+        "husky": "^7.0.4",
+        "lint-staged": "^11.2.6",
+        "nodemon": "^2.0.14",
+        "prettier": "^2.4.1",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.4.4"
+    },
+    "prettier": {
+        "singleQuote": true,
+        "trailingComma": "none",
+        "arrowParens": "avoid",
+        "tabWidth": 4
+    },
+    "lint-staged": {
+        "*.{md,json,yml,ts}": "prettier --write",
+        "*.ts": "eslint --fix"
+    },
+    "scripts": {
+        "prepare": "husky install",
+        "test": "lint-staged",
+        "dev": "nodemon --inspect --watch source/**/* -e ts --exec node -r ts-node/register source/",
+        "build": "rm -rf dist/  &&  tsc",
+        "deploy": "lint-staged  &&  npm run build  &&  lean deploy",
+        "start": "node dist/"
+    }
+}
